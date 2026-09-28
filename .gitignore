@@ -1,0 +1,29 @@
+# Build output (SwiftPM + scripts/build-app.sh)
+.build/
+build/
+*.app
+*.dSYM/
+*.dSYM.zip
+
+# Xcode (if someone opens Package.swift in Xcode)
+.swiftpm/
+DerivedData/
+xcuserdata/
+*.xcodeproj
+*.xcworkspace
+*.xcuserstate
+
+# Editors / OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Local Claude Code settings for this repo (personal permissions, never shared)
+.claude/settings.local.json
+CLAUDE.md
+
+# Logs and local diagnostics
+*.log
+
+

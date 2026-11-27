@@ -15,8 +15,8 @@ final class TouchBarPresenter: NSObject, NSTouchBarDelegate {
     private var preferredWidth: NSLayoutConstraint?
     private var maxWidth: NSLayoutConstraint?
 
-    /// Space the system gives a modal bar: ~1000 pt full width, ~640 pt next to the collapsed Control Strip.
-    private var targetWidth: CGFloat { showControlStrip ? 640 : 1000 }
+    /// Space the system gives a modal bar: ~1000 pt full width, ~750 pt next to the collapsed Control Strip.
+    private var targetWidth: CGFloat { showControlStrip ? 750 : 1000 }
 
     private func applyWidth() {
         preferredWidth?.constant = targetWidth

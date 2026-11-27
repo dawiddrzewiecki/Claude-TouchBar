@@ -11,7 +11,18 @@ final class TouchBarPresenter: NSObject, NSTouchBarDelegate {
     private var trayItem: NSCustomTouchBarItem?
     private(set) var isPresented = false
     /// When true the bar is shown next to the system Control Strip instead of covering the whole Touch Bar.
-    var showControlStrip = false
+    var showControlStrip = false { didSet { applyWidth() } }
+    private var preferredWidth: NSLayoutConstraint?
+    private var maxWidth: NSLayoutConstraint?
+
+    /// Space the system gives a modal bar: ~1000 pt full width, ~640 pt next to the collapsed Control Strip.
+    private var targetWidth: CGFloat { showControlStrip ? 640 : 1000 }
+
+    private func applyWidth() {
+        preferredWidth?.constant = targetWidth
+        maxWidth?.constant = targetWidth
+        barView.needsLayout = true
+    }
     var onTrayTap: (() -> Void)?
 
     private typealias SetPresence = @convention(c) (NSString, ObjCBool) -> Void
@@ -100,9 +111,13 @@ final class TouchBarPresenter: NSObject, NSTouchBarDelegate {
         guard identifier == Self.barItemID else { return nil }
         let item = NSCustomTouchBarItem(identifier: identifier)
         barView.translatesAutoresizingMaskIntoConstraints = false
-        let preferred = barView.widthAnchor.constraint(equalToConstant: 1000)
+        let preferred = barView.widthAnchor.constraint(equalToConstant: targetWidth)
         preferred.priority = .defaultLow
-        NSLayoutConstraint.activate([preferred, barView.widthAnchor.constraint(greaterThanOrEqualToConstant: 480)])
+        let maximum = barView.widthAnchor.constraint(lessThanOrEqualToConstant: targetWidth)
+        maximum.priority = .defaultHigh
+        preferredWidth = preferred
+        maxWidth = maximum
+        NSLayoutConstraint.activate([preferred, maximum, barView.widthAnchor.constraint(greaterThanOrEqualToConstant: 480)])
         item.view = barView
         return item
     }

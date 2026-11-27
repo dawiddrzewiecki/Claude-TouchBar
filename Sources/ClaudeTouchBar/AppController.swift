@@ -1,6 +1,5 @@
 import AppKit
 import ClaudeBarCore
-import ServiceManagement
 
 final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let settings = Settings.shared
@@ -24,6 +23,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         for view in barViews { configure(view) }
         presenter.onTrayTap = { [weak self] in self?.toggleTouchBar() }
 
+        presenter.showControlStrip = settings.showControlStrip
         if presenter.isAvailable {
             presenter.install()
             presenter.present()
@@ -246,7 +246,8 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         add(behaviour, "Show When Claude Needs You", #selector(menuTogglePresentOnRequest)).state = settings.presentOnRequest ? .on : .off
         add(behaviour, "Answer Claude from the Touch Bar", #selector(menuToggleAnswerKeys)).state = settings.answerKeys ? .on : .off
         add(behaviour, "Fold Away When Claude Isn’t Running", #selector(menuToggleHideOffline)).state = settings.hideWhenOffline ? .on : .off
-        add(behaviour, "Launch at Login", #selector(menuToggleLogin)).state = SMAppService.mainApp.status == .enabled ? .on : .off
+        add(behaviour, "Keep Control Strip Visible", #selector(menuToggleControlStrip)).state = settings.showControlStrip ? .on : .off
+        add(behaviour, "Launch at Login", #selector(menuToggleLogin)).state = LoginItem.isEnabled ? .on : .off
         submenu(menu, "Behavior", behaviour)
         menu.addItem(.separator())
 
@@ -347,6 +348,12 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func menuToggleAutoPresent() { settings.autoPresent.toggle() }
     @objc private func menuToggleHideOffline() { settings.hideWhenOffline.toggle() }
+
+    @objc private func menuToggleControlStrip() {
+        settings.showControlStrip.toggle()
+        presenter.showControlStrip = settings.showControlStrip
+        presenter.refreshPlacement()
+    }
     @objc private func menuTogglePresentOnRequest() { settings.presentOnRequest.toggle() }
 
     @objc private func menuToggleAnswerKeys() {
@@ -356,7 +363,7 @@ final class AppController: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func menuToggleLogin() {
         do {
-            if SMAppService.mainApp.status == .enabled { try SMAppService.mainApp.unregister() } else { try SMAppService.mainApp.register() }
+            try LoginItem.toggle()
         } catch {
             NSSound.beep()
         }

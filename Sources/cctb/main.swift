@@ -3,6 +3,11 @@ import Darwin
 import Foundation
 import notify
 
+// libproc is not exported by the Darwin module in older SDKs (macOS 12 and earlier),
+// so bind the symbol directly. It exists in libSystem on every supported macOS.
+@_silgen_name("proc_pidpath")
+private func cctbProcPidPath(_ pid: Int32, _ buffer: UnsafeMutableRawPointer?, _ size: UInt32) -> Int32
+
 func readStdin() -> Data { FileHandle.standardInput.readDataToEndOfFile() }
 
 func claudeAncestorPid() -> Int32? {
@@ -13,7 +18,7 @@ func claudeAncestorPid() -> Int32? {
         var mib: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, pid]
         guard sysctl(&mib, 4, &info, &size, nil, 0) == 0, size > 0 else { return nil }
         var buffer = [CChar](repeating: 0, count: 4096)
-        if proc_pidpath(pid, &buffer, UInt32(buffer.count)) > 0 {
+        if cctbProcPidPath(pid, &buffer, UInt32(buffer.count)) > 0 {
             let path = String(cString: buffer)
             if path.hasSuffix("/claude") || path.contains("/claude/versions/") || path.contains("claude-code") { return pid }
         }

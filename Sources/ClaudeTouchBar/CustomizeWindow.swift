@@ -255,7 +255,12 @@ private final class InspectorView: NSView {
         let spacer = NSView()
         spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
         stack.addArrangedSubview(spacer)
-        let remove = NSButton(title: "Remove", image: NSImage(systemSymbolName: "trash", accessibilityDescription: nil)!, target: self, action: #selector(removeTapped))
+        let remove: NSButton
+        if #available(macOS 11.0, *), let trash = NSImage(systemSymbolName: "trash", accessibilityDescription: nil) {
+            remove = NSButton(title: "Remove", image: trash, target: self, action: #selector(removeTapped))
+        } else {
+            remove = NSButton(title: "Remove", target: self, action: #selector(removeTapped))
+        }
         remove.bezelStyle = .rounded
         remove.imagePosition = .imageLeading
         stack.addArrangedSubview(remove)
@@ -407,7 +412,7 @@ final class CustomizeView: NSView {
         reset.target = self
         reset.action = #selector(resetTapped)
         for b in [done, cancel, reset] {
-            b.controlSize = .large
+            if #available(macOS 11.0, *) { b.controlSize = .large } else { b.controlSize = .regular }
             addSubview(b)
         }
 

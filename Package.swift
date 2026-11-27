@@ -1,9 +1,9 @@
-// swift-tools-version:5.10
+// swift-tools-version:5.7
 import PackageDescription
 
 let package = Package(
     name: "ClaudeTouchBar",
-    platforms: [.macOS(.v13)],
+    platforms: [.macOS(.v10_15)],
     products: [
         .executable(name: "ClaudeTouchBar", targets: ["ClaudeTouchBar"]),
         .executable(name: "cctb", targets: ["cctb"]),

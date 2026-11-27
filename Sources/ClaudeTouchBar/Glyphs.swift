@@ -53,6 +53,8 @@ enum Glyphs {
     }
 
     static func symbol(_ name: String, pointSize: CGFloat, weight: NSFont.Weight = .medium, color: NSColor) -> CGImage? {
+        // SF Symbols APIs need macOS 11; on Catalina the icon is simply omitted.
+        guard #available(macOS 11.0, *) else { return nil }
         let config = NSImage.SymbolConfiguration(pointSize: pointSize, weight: weight)
         guard let base = NSImage(systemSymbolName: name, accessibilityDescription: nil)?.withSymbolConfiguration(config) else { return nil }
         let size = base.size

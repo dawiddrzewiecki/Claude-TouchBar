@@ -123,7 +123,7 @@ Start from a preset in the editor, or switch layouts straight from the menu bar 
 
 ## Install
 
-**Requirements:** macOS 13 or later, [Claude Code](https://docs.anthropic.com/en/docs/claude-code), and a MacBook Pro with a Touch Bar. Other Macs get the on-screen preview.
+**Requirements:** macOS 10.15 Catalina or later (Monterey, Big Sur and Catalina included), [Claude Code](https://docs.anthropic.com/en/docs/claude-code), and a MacBook Pro with a Touch Bar. Other Macs get the on-screen preview.
 
 ### Download
 
@@ -136,7 +136,7 @@ Start from a preset in the editor, or switch layouts straight from the menu bar 
 
 ### Build from source
 
-Only the Xcode Command Line Tools are needed (Swift 5.10 or later), not Xcode:
+Only the Xcode Command Line Tools are needed (Swift 5.7 or later — e.g. CLT 14 on Monterey), not Xcode. If `swift build` fails with older or partial Command Line Tools, the script falls back to plain `swiftc`. On Big Sur / Catalina, where the newest available Swift is older than 5.7, build on a newer Mac (`UNIVERSAL=1 scripts/build-app.sh`) and copy the app over — it runs on macOS 10.15+:
 
 ```bash
 git clone https://github.com/<you>/claude-touchbar.git && cd claude-touchbar

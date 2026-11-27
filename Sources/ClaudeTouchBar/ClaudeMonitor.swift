@@ -380,7 +380,7 @@ final class TopicReader {
         defer { try? handle.close() }
         let start = size - entry.offset > Self.maxRead ? size - Self.maxRead : entry.offset
         try? handle.seek(toOffset: start)
-        guard let data = try? handle.read(upToCount: Int(size - start)), !data.isEmpty,
+        guard case let data = handle.readData(ofLength: Int(size - start)), !data.isEmpty,
               let lastNewline = data.lastIndex(of: UInt8(ascii: "\n")) else { return entry.title }
         let complete = data[data.startIndex...lastNewline]
         for marker in Self.markers {

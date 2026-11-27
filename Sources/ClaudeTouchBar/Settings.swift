@@ -13,6 +13,7 @@ final class Settings {
             "presentOnRequest": true,
             "hideWhenOffline": true,
             "answerKeys": true,
+            "showControlStrip": false,
         ])
     }
 
@@ -60,5 +61,11 @@ final class Settings {
     var answerKeys: Bool {
         get { d.bool(forKey: "answerKeys") }
         set { d.set(newValue, forKey: "answerKeys") }
+    }
+
+    /// Keep the macOS Control Strip (brightness, volume, Siri…) visible next to the bar.
+    var showControlStrip: Bool {
+        get { d.bool(forKey: "showControlStrip") }
+        set { d.set(newValue, forKey: "showControlStrip") }
     }
 }

@@ -10,6 +10,8 @@ final class TouchBarPresenter: NSObject, NSTouchBarDelegate {
     private let touchBar = NSTouchBar()
     private var trayItem: NSCustomTouchBarItem?
     private(set) var isPresented = false
+    /// When true the bar is shown next to the system Control Strip instead of covering the whole Touch Bar.
+    var showControlStrip = false
     var onTrayTap: (() -> Void)?
 
     private typealias SetPresence = @convention(c) (NSString, ObjCBool) -> Void
@@ -60,8 +62,18 @@ final class TouchBarPresenter: NSObject, NSTouchBarDelegate {
 
     func present() {
         guard isAvailable, let (sel, fn) = classMethod(NSTouchBar.self, "presentSystemModalTouchBar:placement:systemTrayItemIdentifier:", as: PresentFn.self) else { return }
-        fn(NSTouchBar.self, sel, touchBar, 1, Self.trayItemID.rawValue as NSString)
+        // placement 1 = full width (hides the Control Strip), 0 = leave the Control Strip visible.
+        fn(NSTouchBar.self, sel, touchBar, showControlStrip ? 0 : 1, Self.trayItemID.rawValue as NSString)
         isPresented = true
+    }
+
+    /// Re-presents the bar so a changed `showControlStrip` takes effect immediately.
+    func refreshPlacement() {
+        guard isAvailable, isPresented else { return }
+        if let (sel, fn) = classMethod(NSTouchBar.self, "dismissSystemModalTouchBar:", as: TouchBarFn.self) {
+            fn(NSTouchBar.self, sel, touchBar)
+        }
+        present()
     }
 
     func minimize() {
